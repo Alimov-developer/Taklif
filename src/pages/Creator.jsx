@@ -59,13 +59,13 @@ const Creator = () => {
 
   return (
     <AnimatedPage className="page-container">
-      <h2 style={{ textAlign: 'center', marginBottom: '2rem', fontFamily: 'var(--font-serif)' }}>Taklifnoma yaratish</h2>
+      <h2 style={{ textAlign: 'center', marginBottom: '2rem', fontFamily: 'var(--font-serif)', color: 'var(--text-dark)' }}>Taklifnoma yaratish</h2>
       
       {!generatedLink ? (
         <div className="card" style={{ maxWidth: '600px', margin: '0 auto' }}>
           <div className="rsvp-form">
               <>
-                <div style={{ background: 'var(--primary-light)', padding: '1rem', borderRadius: '12px', marginBottom: '1.5rem', textAlign: 'center' }}>
+                <div style={{ background: 'var(--primary-light)', padding: '1rem', borderRadius: '12px', marginBottom: '1.5rem', textAlign: 'center', color: 'var(--primary)' }}>
                    ✨ Taklifnoma yaratish xizmati <b>mutlaqo bepul!</b>
                 </div>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
@@ -146,7 +146,7 @@ const Creator = () => {
            <h3>Tabriklaymiz!</h3>
            <p style={{ color: 'var(--text-muted)', margin: '1rem 0' }}>Taklifnomangiz bazaga saqlandi. Havolani nusxalab Telegram orqali yuboring.</p>
            
-           <div style={{ background: 'var(--bg-main)', border: '1px dashed var(--border-color)', padding: '1rem', borderRadius: '12px', wordBreak: 'break-all', fontSize: '0.8rem', margin: '1rem 0' }}>
+           <div style={{ background: 'var(--bg-main)', border: '1px dashed var(--border-color)', padding: '1rem', borderRadius: '12px', wordBreak: 'break-all', fontSize: '0.8rem', margin: '1rem 0', color: 'var(--text-dark)' }}>
              {generatedLink}
            </div>
 

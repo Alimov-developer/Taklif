@@ -100,15 +100,15 @@ const Dashboard = () => {
               style={{ background: 'linear-gradient(135deg, #1e1e1e 0%, #121212 100%)', padding: '3rem 2rem', borderRadius: '45px', textAlign: 'center', maxWidth: '380px', width: '90%', border: '2px solid rgba(212, 175, 55, 0.4)', boxShadow: '0 0 60px rgba(212, 175, 55, 0.2)' }}
             >
                <motion.div animate={{ y: [0, -20, 0] }} transition={{ duration: 2, repeat: Infinity }} style={{ fontSize: '6rem', marginBottom: '1.5rem', filter: 'drop-shadow(0 10px 20px rgba(212, 175, 55, 0.3))' }}>🎁</motion.div>
-               <h2 style={{ fontSize: '2rem', color: 'var(--primary)', marginBottom: '12px', fontFamily: 'var(--font-serif)' }}>{lang === 'uz' ? 'Kunlik Sovg\'a!' : 'Daily Reward!'}</h2>
-               <p style={{ opacity: 0.7, marginBottom: '2rem', fontSize: '1.1rem' }}>{lang === 'uz' ? 'Bugun kirganingiz uchun bonus!' : 'Daily login bonus for you!'}</p>
+               <h2 style={{ fontSize: '2rem', color: 'var(--primary)', marginBottom: '12px', fontFamily: 'var(--font-serif)' }}>{langConfig.dailyGift}</h2>
+               <p style={{ opacity: 0.7, marginBottom: '2rem', fontSize: '1.1rem', color: 'var(--text-dark)' }}>{langConfig.dailyBonus}</p>
                <div style={{ fontSize: '3rem', fontWeight: 'bold', color: '#f1c40f', marginBottom: '2.5rem', textShadow: '0 0 20px rgba(241, 196, 15, 0.3)' }}>+50 🪙</div>
                <motion.button 
                 whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}
                 onClick={claimDailyReward}
                 style={{ width: '100%', padding: '18px', borderRadius: '22px', fontSize: '1.2rem', background: 'linear-gradient(45deg, #d4af37, #f1c40f)', color: '#000', border: 'none', fontWeight: 'bold', cursor: 'pointer', boxShadow: '0 10px 25px rgba(212, 175, 55, 0.3)' }}
                >
-                 {lang === 'uz' ? 'QABUL QILISH' : 'CLAIM'}
+                 {langConfig.claimReward}
                </motion.button>
             </motion.div>
           </motion.div>
@@ -161,29 +161,29 @@ const Dashboard = () => {
             </div>
             <div>
               <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginBottom: '4px' }}>{langConfig.availableCoins}</div>
-              <div style={{ fontSize: '1.8rem', fontWeight: 'bold', color: 'white' }}>{coins} 🪙</div>
+              <div style={{ fontSize: '1.8rem', fontWeight: 'bold', color: 'var(--text-dark)' }}>{coins} 🪙</div>
             </div>
           </motion.div>
           
-          <motion.div whileHover={{ y: -5 }} className="card" style={{ padding: '2rem', background: 'rgba(255,255,255,0.02)' }}>
+          <motion.div whileHover={{ y: -5 }} className="card" style={{ padding: '2rem', background: 'var(--bg-card)' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.2rem' }}>
-               <div style={{ fontSize: '1rem', fontWeight: 'bold', color: 'white' }}>💰 {langConfig.budget}</div>
+               <div style={{ fontSize: '1rem', fontWeight: 'bold', color: 'var(--text-dark)' }}>💰 {langConfig.budget}</div>
                <div style={{ fontSize: '0.8rem', color: 'var(--primary)', fontWeight: 'bold' }}>45% Used</div>
             </div>
             <div style={{ height: '12px', background: 'rgba(255,255,255,0.05)', borderRadius: '10px', overflow: 'hidden', border: '1px solid rgba(255,255,255,0.05)' }}>
                <motion.div initial={{ width: 0 }} animate={{ width: '45%' }} transition={{ duration: 1, ease: "easeOut" }} style={{ height: '100%', background: 'linear-gradient(90deg, #d4af37, #f1c40f)', borderRadius: '10px' }} />
             </div>
-            <div style={{ marginTop: '12px', fontSize: '0.8rem', color: 'var(--text-muted)', display: 'flex', justifyContent: 'space-between' }}>
-              <span>Plan: $5,000</span>
-              <span>Spent: $2,250</span>
-            </div>
+              <div style={{ marginTop: '12px', fontSize: '0.8rem', color: 'var(--text-muted)', display: 'flex', justifyContent: 'space-between' }}>
+                <span style={{ color: 'var(--text-muted)' }}>Plan: $5,000</span>
+                <span style={{ color: 'var(--text-muted)' }}>Spent: $2,250</span>
+              </div>
           </motion.div>
         </div>
 
         {/* 3. My Invitations */}
         <section>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
-            <h3 style={{ display: 'flex', alignItems: 'center', gap: '12px', fontSize: '1.6rem', color: 'white', fontFamily: 'var(--font-serif)' }}>
+            <h3 style={{ display: 'flex', alignItems: 'center', gap: '12px', fontSize: '1.6rem', color: 'var(--text-dark)', fontFamily: 'var(--font-serif)' }}>
               <span style={{ fontSize: '1.8rem' }}>📸</span> {langConfig.gallery}
             </h3>
             <motion.button 
@@ -228,10 +228,10 @@ const Dashboard = () => {
         </section>
 
         {/* 4. Tasks & Calendar (Bottom Grid) */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '2rem' }}>
-            <section className="card" style={{ padding: '2.5rem', background: 'rgba(255,255,255,0.02)' }}>
+        <div className="dashboard-main-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '2rem' }}>
+            <section className="card" style={{ padding: '2.5rem', background: 'var(--bg-card)' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
-                <h3 style={{ margin: 0, display: 'flex', alignItems: 'center', gap: '12px', color: 'white', fontSize: '1.4rem' }}>
+                <h3 style={{ margin: 0, display: 'flex', alignItems: 'center', gap: '12px', color: 'var(--text-dark)', fontSize: '1.4rem' }}>
                   <span style={{ fontSize: '1.8rem' }}>📝</span> {langConfig.tasks}
                 </h3>
                 <div style={{ fontSize: '0.8rem', background: 'rgba(212, 175, 55, 0.1)', color: 'var(--primary)', padding: '4px 12px', borderRadius: '50px', fontWeight: 'bold' }}>
@@ -257,34 +257,34 @@ const Dashboard = () => {
                     >
                       <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
                         <input type="checkbox" checked={task.completed} onChange={() => toggleTask(task.id)} style={{ width: '22px', height: '22px', accentColor: 'var(--primary)', cursor: 'pointer' }} />
-                        <span style={{ textDecoration: task.completed ? 'line-through' : 'none', opacity: task.completed ? 0.4 : 1, fontWeight: '500', color: 'white' }}>
+                        <span style={{ textDecoration: task.completed ? 'line-through' : 'none', opacity: task.completed ? 0.4 : 1, fontWeight: '500', color: 'var(--text-dark)' }}>
                           {task.text}
                         </span>
                       </div>
-                      <button onClick={() => deleteTask(task.id)} style={{ background: 'transparent', border: 'none', color: 'rgba(255,255,255,0.3)', cursor: 'pointer', fontSize: '1.2rem' }}>✕</button>
+                      <button onClick={() => deleteTask(task.id)} style={{ background: 'transparent', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', fontSize: '1.2rem', opacity: 0.5 }}>✕</button>
                     </motion.div>
                   ))}
                 </AnimatePresence>
               </div>
             </section>
 
-            <section className="card" style={{ padding: '2.5rem', background: 'rgba(255,255,255,0.02)' }}>
+            <section className="card" style={{ padding: '2.5rem', background: 'var(--bg-card)' }}>
               <div className="calendar-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2.5rem' }}>
-                 <h3 style={{ margin: 0, display: 'flex', alignItems: 'center', gap: '12px', color: 'white', fontSize: '1.4rem' }}>
+                 <h3 style={{ margin: 0, display: 'flex', alignItems: 'center', gap: '12px', color: 'var(--text-dark)', fontSize: '1.4rem' }}>
                    <div style={{ background: 'var(--primary)', width: '36px', height: '36px', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                       <CalendarIcon size={18} color="black" />
                    </div>
                    <span>{langConfig.cal}</span>
                  </h3>
                  <div style={{ display: 'flex', gap: '8px', background: 'rgba(255,255,255,0.05)', padding: '5px', borderRadius: '15px' }}>
-                    <motion.button whileTap={{ scale: 0.9 }} onClick={handlePrevMonth} style={{ background: 'transparent', border: 'none', color: 'white', cursor: 'pointer' }}><ChevronLeft size={18} /></motion.button>
+                    <motion.button whileTap={{ scale: 0.9 }} onClick={handlePrevMonth} style={{ background: 'transparent', border: 'none', color: 'var(--text-dark)', cursor: 'pointer' }}><ChevronLeft size={18} /></motion.button>
                     <div style={{ padding: '0 10px', fontWeight: 'bold', fontSize: '0.85rem', color: 'var(--primary)' }}>{date.toLocaleString(lang === 'uz' ? 'uz-UZ' : 'en-US', { month: 'short' })}</div>
-                    <motion.button whileTap={{ scale: 0.9 }} onClick={handleNextMonth} style={{ background: 'transparent', border: 'none', color: 'white', cursor: 'pointer' }}><ChevronRight size={18} /></motion.button>
+                    <motion.button whileTap={{ scale: 0.9 }} onClick={handleNextMonth} style={{ background: 'transparent', border: 'none', color: 'var(--text-dark)', cursor: 'pointer' }}><ChevronRight size={18} /></motion.button>
                  </div>
               </div>
               
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '10px', textAlign: 'center' }}>
-                {['M', 'T', 'W', 'T', 'F', 'S', 'S'].map(d => <div key={d} style={{ color: 'rgba(255,255,255,0.3)', fontWeight: 'bold', fontSize: '0.7rem' }}>{d}</div>)}
+                {['M', 'T', 'W', 'T', 'F', 'S', 'S'].map(d => <div key={d} style={{ color: 'var(--text-muted)', fontWeight: 'bold', fontSize: '0.7rem', opacity: 0.6 }}>{d}</div>)}
                 {Array.from({ length: firstDay === 0 ? 6 : firstDay - 1 }).map((_, i) => <div key={`empty-${i}`}></div>)}
                 {Array.from({ length: daysInMonth }).map((_, i) => {
                   const dayNum = i + 1;
@@ -296,7 +296,7 @@ const Dashboard = () => {
                       style={{ 
                         aspectRatio: '1', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '12px', cursor: 'pointer', fontSize: '0.9rem',
                         background: isSelected ? 'var(--primary)' : isActualToday ? 'rgba(212, 175, 55, 0.2)' : 'transparent',
-                        color: isSelected ? 'black' : 'white',
+                        color: isSelected ? '#000' : 'var(--text-dark)',
                         fontWeight: isSelected || isActualToday ? 'bold' : 'normal',
                         border: isActualToday ? '1px solid var(--primary)' : '1px solid transparent'
                       }}>
@@ -307,9 +307,9 @@ const Dashboard = () => {
               </div>
               
               <AnimatePresence mode="wait">
-                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} key={selectedDay} style={{ marginTop: '2rem', padding: '1.2rem', background: 'rgba(255,255,255,0.03)', borderRadius: '20px', border: '1px solid rgba(255,255,255,0.05)' }}>
-                  <div style={{ fontSize: '0.85rem', color: 'rgba(255,255,255,0.4)' }}>Plans for {selectedDay} {date.toLocaleString(lang === 'uz' ? 'uz-UZ' : 'en-US', { month: 'long' })}</div>
-                  <p style={{ margin: '8px 0 0', color: 'rgba(255,255,255,0.7)', fontSize: '0.9rem' }}>No events planned yet. ✨</p>
+                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} key={selectedDay} style={{ marginTop: '2rem', padding: '1.2rem', background: 'rgba(255,255,255,0.03)', borderRadius: '20px', border: '1px solid var(--border-color)' }}>
+                  <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Plans for {selectedDay} {date.toLocaleString(lang === 'uz' ? 'uz-UZ' : 'en-US', { month: 'long' })}</div>
+                  <p style={{ margin: '8px 0 0', color: 'var(--text-dark)', fontSize: '0.9rem', opacity: 0.8 }}>No events planned yet. ✨</p>
                 </motion.div>
               </AnimatePresence>
             </section>

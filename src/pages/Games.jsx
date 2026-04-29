@@ -228,8 +228,8 @@ const Games = () => {
                 </div>
                 
                 <div style={{ flex: 1 }}>
-                  <h3 style={{ fontSize: '1.3rem', marginBottom: '0.5rem', fontWeight: 'bold', color: 'white' }}>{game.name}</h3>
-                  <p style={{ fontSize: '0.9rem', color: 'rgba(255,255,255,0.6)', lineHeight: '1.4' }}>{game.desc}</p>
+                  <h3 style={{ fontSize: '1.3rem', marginBottom: '0.5rem', fontWeight: 'bold', color: 'var(--text-dark)' }}>{game.name}</h3>
+                  <p style={{ fontSize: '0.9rem', color: 'var(--text-muted)', lineHeight: '1.4' }}>{game.desc}</p>
                 </div>
 
                 <div style={{ 
@@ -238,13 +238,13 @@ const Games = () => {
                   alignItems: 'center',
                   marginTop: '0.5rem',
                   padding: '10px 15px',
-                  background: 'rgba(255,255,255,0.05)',
+                  background: 'var(--glass)',
                   borderRadius: '15px'
                 }}>
                    <div style={{ fontSize: '0.8rem', fontWeight: 'bold', color: game.color }}>
                       {game.reward}
                    </div>
-                   <ChevronRight size={18} color="rgba(255,255,255,0.3)" />
+                   <ChevronRight size={18} color="var(--text-muted)" />
                 </div>
               </motion.div>
             ))}
