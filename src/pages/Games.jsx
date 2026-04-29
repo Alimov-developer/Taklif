@@ -8,6 +8,7 @@ import TetrisGame from '../components/TetrisGame';
 import RunnerGame from '../components/RunnerGame';
 import MemoryGame from '../components/MemoryGame';
 import SlidePuzzle from '../components/SlidePuzzle';
+import WheelOfFortune from '../components/WheelOfFortune';
 
 const Games = () => {
   const { langConfig, lang, coins, handleSnakeEarnCoins } = useContext(AppContext);
@@ -56,8 +57,18 @@ const Games = () => {
       desc: lang === 'uz' ? 'Raqamlarni tartib bilan joylang.' : lang === 'ru' ? 'Расставьте цифры по порядку.' : 'Arrange numbers in order.',
       icon: '🎨',
       color: '#4caf50',
-      reward: lang === 'uz' ? 'G\'alaba = 50 tanga' : lang === 'ru' ? 'Победа = 50 койнов' : 'Victory = 50 coins',
+      reward: lang === 'uz' ? 'G\'alaba = 20-80 tanga' : lang === 'ru' ? 'Победа = 20-80 койнов' : 'Victory = 20-80 coins',
       playable: true
+    },
+    {
+      id: 'wheel',
+      name: lang === 'uz' ? 'Omad G\'ildiragi' : 'Wheel of Fortune',
+      desc: lang === 'uz' ? 'Har kuni omadingizni sinab ko\'ring!' : 'Test your luck every day!',
+      icon: '🎡',
+      color: '#ff9800',
+      reward: lang === 'uz' ? 'Yutuq = 200 tangagacha' : 'Win = up to 200 coins',
+      playable: true,
+      isNew: true
     }
   ];
 
@@ -73,6 +84,8 @@ const Games = () => {
         return <MemoryGame onEarnCoins={handleSnakeEarnCoins} />;
       case 'puzzle':
         return <SlidePuzzle onEarnCoins={handleSnakeEarnCoins} />;
+      case 'wheel':
+        return <WheelOfFortune onEarnCoins={handleSnakeEarnCoins} />;
       default:
         return null;
     }
@@ -189,6 +202,9 @@ const Games = () => {
                   flexShrink: 0
                 }}>
                   {game.icon}
+                  {game.isNew && (
+                    <div style={{ position: 'absolute', top: '-5px', right: '-5px', background: '#ff4444', color: 'white', fontSize: '0.6rem', padding: '2px 5px', borderRadius: '5px', fontWeight: 'bold' }}>NEW</div>
+                  )}
                 </div>
                 <div style={{ flex: 1, textAlign: 'left' }}>
                   <h3 style={{ fontSize: '1rem', marginBottom: '0.2rem', fontWeight: 'bold' }}>{game.name}</h3>
