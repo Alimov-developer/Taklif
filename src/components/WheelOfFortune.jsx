@@ -7,6 +7,25 @@ const WheelOfFortune = ({ onEarnCoins }) => {
   const [isSpinning, setIsSpinning] = useState(false);
   const [result, setResult] = useState(null);
   const [rotation, setRotation] = useState(0);
+  const [canSpin, setCanSpin] = useState(true);
+
+  const checkCanSpin = useCallback(() => {
+    const lastSpin = localStorage.getItem('last_wheel_spin');
+    if (lastSpin) {
+      const lastDate = new Date(parseInt(lastSpin)).toDateString();
+      const today = new Date().toDateString();
+      if (lastDate === today) {
+        setCanSpin(false);
+        return false;
+      }
+    }
+    setCanSpin(true);
+    return true;
+  }, []);
+
+  useEffect(() => {
+    checkCanSpin();
+  }, [checkCanSpin]);
   
   const segments = [
     { value: 10, color: '#FFD700', label: '10' },
@@ -20,24 +39,25 @@ const WheelOfFortune = ({ onEarnCoins }) => {
   ];
 
   const spin = () => {
-    if (isSpinning) return;
+    if (isSpinning || !canSpin) return;
     
     setIsSpinning(true);
     setResult(null);
     
-    const extraRotations = 5 + Math.random() * 5;
+    const extraRotations = 8 + Math.random() * 5;
     const finalRotation = rotation + extraRotations * 360;
     setRotation(finalRotation);
     
     setTimeout(() => {
       const normalizedRotation = finalRotation % 360;
       const segmentAngle = 360 / segments.length;
-      // Calculate which segment is at the top (pointer is at 0 degrees)
       const winningIndex = Math.floor((360 - (normalizedRotation % 360)) / segmentAngle) % segments.length;
       const win = segments[winningIndex];
       
       setResult(win.value);
       setIsSpinning(false);
+      setCanSpin(false);
+      localStorage.setItem('last_wheel_spin', Date.now().toString());
       if (win.value > 0) onEarnCoins(win.value);
     }, 4000);
   };
@@ -96,16 +116,22 @@ const WheelOfFortune = ({ onEarnCoins }) => {
         )}
         
         <button 
-          onClick={spin} disabled={isSpinning}
+          onClick={spin} disabled={isSpinning || !canSpin}
           style={{ 
             padding: '15px 40px', borderRadius: '50px', border: 'none', 
-            background: isSpinning ? '#ccc' : 'linear-gradient(45deg, #FFD700, #FFA500)', 
-            color: '#000', fontWeight: 'bold', fontSize: '1.1rem', cursor: isSpinning ? 'default' : 'pointer',
-            boxShadow: '0 10px 20px rgba(255, 165, 0, 0.3)'
+            background: (isSpinning || !canSpin) ? '#ccc' : 'linear-gradient(45deg, #FFD700, #FFA500)', 
+            color: (isSpinning || !canSpin) ? '#888' : '#000', fontWeight: 'bold', fontSize: '1.1rem', cursor: (isSpinning || !canSpin) ? 'default' : 'pointer',
+            boxShadow: (isSpinning || !canSpin) ? 'none' : '0 10px 20px rgba(255, 165, 0, 0.3)'
           }}
         >
-          {isSpinning ? (lang === 'uz' ? 'Aylanmoqda...' : 'Spinning...') : (lang === 'uz' ? 'AYLANTIRISH' : 'SPIN')}
+          {isSpinning ? (lang === 'uz' ? 'Aylanmoqda...' : 'Spinning...') : !canSpin ? (lang === 'uz' ? 'ERTAGA QAYTING' : 'COME BACK TOMORROW') : (lang === 'uz' ? 'AYLANTIRISH' : 'SPIN')}
         </button>
+        
+        {!canSpin && !isSpinning && (
+          <p style={{ marginTop: '15px', color: '#ff9800', fontSize: '0.9rem', fontWeight: 'bold' }}>
+            {lang === 'uz' ? 'Bugun o\'z omadingizni sinab ko\'rdingiz!' : 'You have already tested your luck today!'}
+          </p>
+        )}
       </div>
     </div>
   );

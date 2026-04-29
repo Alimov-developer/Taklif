@@ -239,10 +239,10 @@ const InvitationView = () => {
             onClick={() => navigate('/dashboard')}
             style={{ 
               width: '45px', height: '45px', borderRadius: '50%', 
-              background: activeTheme.text === '#fff' ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.08)', 
-              backdropFilter: 'blur(10px)', border: `1px solid ${activeTheme.text}30`, 
-              color: activeTheme.text === '#fff' ? '#fff' : '#000', 
-              display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', boxShadow: '0 4px 15px rgba(0,0,0,0.1)' 
+              background: 'rgba(255,255,255,0.15)', 
+              backdropFilter: 'blur(10px)', border: '1px solid rgba(255,255,255,0.3)', 
+              color: '#fff', 
+              display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', boxShadow: '0 4px 15px rgba(0,0,0,0.2)' 
             }}
           >
             <Home size={20} />
@@ -253,10 +253,10 @@ const InvitationView = () => {
             onClick={() => window.location.reload()}
             style={{ 
               width: '45px', height: '45px', borderRadius: '50%', 
-              background: activeTheme.text === '#fff' ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.08)', 
-              backdropFilter: 'blur(10px)', border: `1px solid ${activeTheme.text}30`, 
-              color: activeTheme.text === '#fff' ? '#fff' : '#000', 
-              display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', boxShadow: '0 4px 15px rgba(0,0,0,0.1)' 
+              background: 'rgba(255,255,255,0.15)', 
+              backdropFilter: 'blur(10px)', border: '1px solid rgba(255,255,255,0.3)', 
+              color: '#fff', 
+              display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', boxShadow: '0 4px 15px rgba(0,0,0,0.2)' 
             }}
           >
             <RotateCw size={20} />

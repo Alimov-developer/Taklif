@@ -6,7 +6,7 @@ import AppContext from '../context/AppContext';
 import AnimatedPage from '../components/AnimatedPage';
 
 const Dashboard = () => {
-  const { user, coins, lang, langConfig, activeUsers } = useContext(AppContext);
+  const { user, coins, lang, langConfig, activeUsers, handleSnakeEarnCoins } = useContext(AppContext);
   const navigate = useNavigate();
   const [date, setDate] = useState(new Date());
   const [selectedDay, setSelectedDay] = useState(new Date().getDate());
@@ -70,8 +70,51 @@ const Dashboard = () => {
     return () => clearInterval(interval);
   }, [closestWedding]);
 
+  const [showDailyReward, setShowDailyReward] = useState(false);
+
+  useEffect(() => {
+    const lastClaim = localStorage.getItem('last_daily_claim');
+    const today = new Date().toDateString();
+    if (lastClaim !== today) {
+      setTimeout(() => setShowDailyReward(true), 1500);
+    }
+  }, []);
+
+  const claimDailyReward = () => {
+    const today = new Date().toDateString();
+    localStorage.setItem('last_daily_claim', today);
+    handleSnakeEarnCoins(50); // Use context method
+    setShowDailyReward(false);
+  };
+
   return (
     <AnimatedPage className="page-container" style={{ paddingBottom: '120px' }}>
+      <AnimatePresence>
+        {showDailyReward && (
+          <motion.div 
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+            style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', background: 'rgba(0,0,0,0.8)', zIndex: 10000, display: 'flex', alignItems: 'center', justifyContent: 'center', backdropFilter: 'blur(10px)' }}
+          >
+            <motion.div 
+              initial={{ scale: 0.5, y: 100 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.5, y: 100 }}
+              style={{ background: 'var(--card-bg)', padding: '3rem 2rem', borderRadius: '40px', textAlign: 'center', maxWidth: '350px', width: '90%', border: '2px solid var(--primary)', boxShadow: '0 0 50px var(--primary-light)' }}
+            >
+               <div style={{ fontSize: '5rem', marginBottom: '1rem' }}>🎁</div>
+               <h2 style={{ fontSize: '1.8rem', color: 'var(--primary)', marginBottom: '10px' }}>{lang === 'uz' ? 'Kunlik Sovg\'a!' : 'Daily Reward!'}</h2>
+               <p style={{ opacity: 0.8, marginBottom: '2rem' }}>{lang === 'uz' ? 'Bugun kirganingiz uchun +50 Tanga!' : '+50 Coins for logging in today!'}</p>
+               <div style={{ fontSize: '2.5rem', fontWeight: 'bold', color: '#f1c40f', marginBottom: '2rem' }}>+50 🪙</div>
+               <button 
+                onClick={claimDailyReward}
+                className="btn-luxury" 
+                style={{ width: '100%', padding: '15px', borderRadius: '20px', fontSize: '1.1rem' }}
+               >
+                 {lang === 'uz' ? 'QABUL QILISH' : 'CLAIM'}
+               </button>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* 1. Hero Countdown / Welcome */}
       <section className="card" style={{ 
         padding: '3rem 2rem', marginBottom: '2.5rem', 
