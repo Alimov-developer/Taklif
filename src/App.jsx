@@ -207,7 +207,8 @@ const AppInner = ({ isMusicPlaying, setIsMusicPlaying, audioRef }) => {
   }
 
   return (
-    <div className="app" style={{ paddingBottom: isPublicRoute ? '0' : '80px' }}>
+    <div className="app" style={{ paddingBottom: isPublicRoute ? '0' : '80px', position: 'relative' }}>
+      <div style={{ position: 'fixed', bottom: '5px', left: '5px', fontSize: '10px', color: 'rgba(128,128,128,0.5)', zIndex: 9999, pointerEvents: 'none' }}>v3.0-PREMIUM-READY</div>
       {!isPublicRoute && (
         <>
           <Navbar />

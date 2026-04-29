@@ -10,7 +10,7 @@ const Creator = () => {
   const { socket, lang, langConfig } = useContext(AppContext);
   const [formData, setFormData] = useState({ 
     groom: '', bride: '', date: '', venue: '', address: '', music: 'classic', 
-    shortName: '', theme: 'midnight', photo: '' 
+    shortName: '', theme: 'midnight', photo: '', aboutUs: '', rsvpDeadline: '' 
   });
   const [generatedLink, setGeneratedLink] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -111,8 +111,22 @@ const Creator = () => {
                  </div>
 
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginTop: '1rem' }}>
+                   <label className="stat-label">{lang === 'uz' ? 'Biz haqimizda (Hikoya)' : 'About Us (Our Story)'}</label>
+                   <textarea className="auth-input" style={{ minHeight: '100px', resize: 'vertical' }} placeholder="..." onChange={e => setFormData({...formData, aboutUs: e.target.value})} />
+                </div>
+
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginTop: '1rem' }}>
                    <label className="stat-label">{lang === 'uz' ? 'Surat (Media)' : lang === 'ru' ? 'Фото (Медиа)' : 'Photo (Media)'}</label>
                    <input type="file" accept="image/*" className="auth-input" onChange={handlePhotoChange} style={{ padding: '8px' }} />
+                   {formData.photo && (
+                     <div style={{ marginTop: '1rem', position: 'relative', width: '100%', height: '150px', borderRadius: '12px', overflow: 'hidden', border: '1px solid var(--border-color)', background: 'rgba(255,255,255,0.05)' }}>
+                       <img src={formData.photo} alt="Preview" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                       <button 
+                        onClick={(e) => { e.preventDefault(); setFormData({...formData, photo: ''}); }}
+                        style={{ position: 'absolute', top: '8px', right: '8px', background: 'rgba(239, 68, 68, 0.9)', color: 'white', border: 'none', borderRadius: '50%', width: '28px', height: '28px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 2px 10px rgba(0,0,0,0.2)' }}
+                       >✕</button>
+                     </div>
+                   )}
                 </div>
 
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginTop: '1rem' }}>

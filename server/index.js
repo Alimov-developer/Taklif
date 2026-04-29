@@ -18,7 +18,8 @@ const io = new Server(server, {
   cors: {
     origin: "*",
     methods: ["GET", "POST"]
-  }
+  },
+  maxHttpBufferSize: 1e8 // 100MB buffer size for large images
 });
 
 const DB_FILE = path.join(__dirname, 'db.json');

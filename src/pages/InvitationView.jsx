@@ -1,9 +1,11 @@
 import React, { useContext, useState, useEffect, useRef } from 'react';
 import { useLocation, useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Calendar, MapPin, Download, Home, X } from 'lucide-react';
+import { Calendar, MapPin, Download, Home, X, RotateCw } from 'lucide-react';
 import { toPng } from 'html-to-image';
 import HeartParticles from '../components/HeartParticles';
+import Petals from '../components/Petals';
+import GoldDust from '../components/GoldDust';
 import AnimatedPage from '../components/AnimatedPage';
 import AppContext from '../context/AppContext';
 
@@ -11,36 +13,86 @@ const InvitationView = () => {
   const { socket, lang, langConfig } = useContext(AppContext);
   const location = useLocation();
   const navigate = useNavigate();
-  const { data } = useParams(); // shortName
+  const { data: rawData } = useParams();
+  const data = rawData?.toLowerCase(); // Case-insensitive match
   const [params, setParams] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0 });
+  const [rsvpName, setRsvpName] = useState('');
+  const [rsvpStatus, setRsvpStatus] = useState('pending'); // pending, sent
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth < 768);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  const searchParams = new URLSearchParams(location.search);
+  const isDlMode = searchParams.get('dl') === '1';
 
   useEffect(() => {
     if (!data) return;
+    console.log("Fetching invitation for:", data);
 
     const fetchFromLocal = () => {
+      // Try specific data key
       const stored = localStorage.getItem(`inv_data_${data}`);
       if (stored) {
         setParams(JSON.parse(stored));
         setIsLoading(false);
+        return;
       }
+      
+      // Try searching in myInvitations list
+      const myInvs = JSON.parse(localStorage.getItem('myInvitations')) || [];
+      const found = myInvs.find(i => i.shortName === data || i.shortName?.toLowerCase() === data);
+      if (found) {
+        setParams(found);
+      }
+      setIsLoading(false);
     };
 
+    // Timeout fallback
+    const timeout = setTimeout(() => {
+      if (isLoading) {
+        console.log("Socket timeout, checking local...");
+        fetchFromLocal();
+      }
+    }, 3000);
+
     if (socket) {
-      socket.emit('get_invitation', data);
-      socket.on('invitation_data', (backendData) => {
+      const handleInvitationData = (backendData) => {
+        console.log("Received invitation data from backend:", backendData);
         if (backendData) {
           setParams(backendData);
           setIsLoading(false);
         } else {
           fetchFromLocal();
         }
-      });
+      };
+      socket.on('invitation_data', handleInvitationData);
+      socket.emit('get_invitation', data);
+      
+      return () => {
+        socket.off('invitation_data', handleInvitationData);
+        clearTimeout(timeout);
+      };
     } else {
       fetchFromLocal();
+      return () => clearTimeout(timeout);
     }
   }, [data, socket]);
+
+  useEffect(() => {
+    if (!isLoading && params && isDlMode) {
+      // Berilgan vaqtda dom tayyor bo'lishi uchun ozgina kutamiz
+      const timer = setTimeout(() => {
+        downloadImage();
+      }, 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [isLoading, params, isDlMode]);
 
   useEffect(() => {
     if (!params?.date) return;
@@ -55,8 +107,6 @@ const InvitationView = () => {
   }, [params]);
 
   const ref = useRef(null);
-  const searchParams = new URLSearchParams(location.search);
-  const isDlMode = searchParams.get('dl') === '1';
 
   const downloadImage = () => {
     if(!ref.current) return;
@@ -86,7 +136,92 @@ const InvitationView = () => {
     }
   };
 
-  if (!params) return <div className="page-container" style={{ textAlign: 'center' }}>Hali yaratilmagan!</div>;
+  if (isLoading) return (
+    <div className="page-container" style={{ 
+      background: '#000', 
+      color: 'white', 
+      display: 'flex', 
+      flexDirection: 'column',
+      alignItems: 'center', 
+      justifyContent: 'center', 
+      height: '100vh',
+      width: '100%',
+      position: 'relative'
+    }}>
+      <GoldDust />
+      <div style={{ position: 'relative', zIndex: 10, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+        <motion.div 
+          animate={{ rotate: 360, scale: [1, 1.1, 1] }} 
+          transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+          style={{ fontSize: '3.5rem', marginBottom: '2rem', filter: 'drop-shadow(0 0 15px rgba(212, 175, 55, 0.5))' }}
+        >
+          💍
+        </motion.div>
+        <motion.div 
+          initial={{ opacity: 0 }} animate={{ opacity: [0.4, 1, 0.4] }} transition={{ duration: 2, repeat: Infinity }}
+          style={{ fontSize: '1.4rem', fontWeight: '300', letterSpacing: '4px', textTransform: 'uppercase', color: '#D4AF37', marginBottom: '2rem' }}
+        >
+          {lang === 'uz' ? 'Yuklanmoqda...' : lang === 'ru' ? 'Загрузка...' : 'Loading...'}
+        </motion.div>
+        <motion.button 
+          whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}
+          onClick={() => window.location.reload()}
+          style={{ background: 'rgba(212, 175, 55, 0.1)', border: '1px solid #D4AF37', color: '#D4AF37', padding: '10px 20px', borderRadius: '12px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '10px' }}
+        >
+          <RotateCw size={18} /> {lang === 'uz' ? 'Qayta yuklash' : 'Reload'}
+        </motion.button>
+      </div>
+    </div>
+  );
+
+  if (!params) return (
+    <div className="page-container" style={{ 
+      textAlign: 'center', 
+      padding: '5rem 2rem', 
+      background: '#000', 
+      color: 'white',
+      height: '100vh',
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      justifyContent: 'center',
+      position: 'relative'
+    }}>
+       <GoldDust />
+       <div style={{ position: 'relative', zIndex: 10, display: 'flex', flexDirection: 'column', alignItems: 'center', maxWidth: '400px' }}>
+         <motion.div 
+           initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: 'spring', damping: 10 }}
+           style={{ width: '100px', height: '100px', borderRadius: '50%', background: 'rgba(255, 68, 68, 0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '2rem', border: '1px solid rgba(255, 68, 68, 0.2)' }}
+         >
+           <X size={48} color="#ff4444" />
+         </motion.div>
+         
+         <h2 style={{ marginBottom: '1rem', fontFamily: 'var(--font-serif)', fontSize: '2rem' }}>
+           {lang === 'uz' ? 'Taklifnoma topilmadi' : lang === 'ru' ? 'Приглашение не найдено' : 'Invitation not found'}
+         </h2>
+         
+         <p style={{ opacity: 0.6, marginBottom: '2.5rem', lineHeight: '1.6', fontSize: '0.95rem' }}>
+           {lang === 'uz' ? 'Taklifnoma hali yaratilmagan yoki o\'chirilgan bo\'lishi mumkin. Iltimos, ma\'lumotlarni qaytadan tekshiring yoki qayta urinib ko\'ring.' : 'It might not be created yet or was deleted. Please check the information or try refreshing.'}
+         </p>
+         
+         <motion.button 
+           whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}
+           onClick={() => window.location.reload()} 
+           className="btn-luxury" 
+           style={{ width: '100%', padding: '15px', borderRadius: '15px', marginBottom: '1rem', background: 'linear-gradient(45deg, #D4AF37, #F1D382)', color: '#000', fontWeight: 'bold', fontSize: '1rem', boxShadow: '0 10px 20px rgba(212, 175, 55, 0.3)' }}
+         >
+           {lang === 'uz' ? 'Sahifani yangilash' : lang === 'ru' ? 'Обновить страницу' : 'Refresh Page'}
+         </motion.button>
+         
+         <button 
+           onClick={() => navigate('/dashboard')} 
+           style={{ background: 'transparent', border: 'none', color: 'white', opacity: 0.5, cursor: 'pointer', fontSize: '0.9rem', textDecoration: 'underline' }}
+         >
+           {lang === 'uz' ? 'Asosiy sahifaga qaytish' : 'Return to Home'}
+         </button>
+       </div>
+    </div>
+  );
 
   const activeTheme = getThemeStyles(params.theme || 'midnight');
 
@@ -102,14 +237,36 @@ const InvitationView = () => {
           <motion.button 
             whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}
             onClick={() => navigate('/dashboard')}
-            style={{ width: '45px', height: '45px', borderRadius: '50%', background: 'rgba(255,255,255,0.15)', backdropFilter: 'blur(10px)', border: '1px solid rgba(255,255,255,0.2)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}
+            style={{ 
+              width: '45px', height: '45px', borderRadius: '50%', 
+              background: activeTheme.text === '#fff' ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.08)', 
+              backdropFilter: 'blur(10px)', border: `1px solid ${activeTheme.text}30`, 
+              color: activeTheme.text === '#fff' ? '#fff' : '#000', 
+              display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', boxShadow: '0 4px 15px rgba(0,0,0,0.1)' 
+            }}
           >
             <Home size={20} />
+          </motion.button>
+          
+          <motion.button 
+            whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}
+            onClick={() => window.location.reload()}
+            style={{ 
+              width: '45px', height: '45px', borderRadius: '50%', 
+              background: activeTheme.text === '#fff' ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.08)', 
+              backdropFilter: 'blur(10px)', border: `1px solid ${activeTheme.text}30`, 
+              color: activeTheme.text === '#fff' ? '#fff' : '#000', 
+              display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', boxShadow: '0 4px 15px rgba(0,0,0,0.1)' 
+            }}
+          >
+            <RotateCw size={20} />
           </motion.button>
        </div>
 
        <div style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', overflow: 'hidden', pointerEvents: 'none', zIndex: 0 }}>
+           <GoldDust />
            <HeartParticles />
+           <Petals color={activeTheme.accent} />
        </div>
        
        <motion.div 
@@ -117,11 +274,12 @@ const InvitationView = () => {
            initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, ease: "easeOut" }}
            className="card no-scrollbar" style={{ 
                width: '100%', maxWidth: '450px', 
-               background: activeTheme.cardBg, backdropFilter: 'blur(25px)', WebkitBackdropFilter: 'blur(25px)',
-               border: `1px solid ${activeTheme.accent}30`, padding: '3rem 2rem', 
-               boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.6)', borderRadius: '40px',
+               background: activeTheme.cardBg, backdropFilter: 'blur(30px)', WebkitBackdropFilter: 'blur(30px)',
+               border: `1px solid ${activeTheme.accent}40`, padding: '3rem 2rem', 
+               boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.7)', borderRadius: '40px',
                position: 'relative', zIndex: 1, color: activeTheme.text,
-               display: 'flex', flexDirection: 'column', gap: '2rem'
+               display: 'flex', flexDirection: 'column', gap: '2rem',
+               marginBottom: '2rem'
            }}
        >
           <motion.div animate={{ rotate: 360 }} transition={{ duration: 20, repeat: Infinity, ease: 'linear' }} style={{ position: 'absolute', top: '-50px', right: '-50px', width: '200px', height: '200px', background: `radial-gradient(circle, ${activeTheme.accent}20 0%, transparent 70%)`, zIndex: -1 }} />
@@ -147,6 +305,12 @@ const InvitationView = () => {
             <p style={{ color: activeTheme.text, opacity: 0.9, fontSize: '1rem', margin: '0.5rem 0', fontWeight: '300', letterSpacing: '1px' }}>
               {lang === 'uz' ? 'Sizni baxt oqshomimizda kutib qolamiz!' : lang === 'ru' ? 'Мы ждем вас на нашем счастливом вечере!' : 'We are waiting for you at our happy evening!'}
             </p>
+
+            {params.aboutUs && (
+              <div style={{ marginTop: '1.5rem', padding: '1rem', borderTop: `1px solid ${activeTheme.accent}20`, fontStyle: 'italic', fontSize: '0.9rem', opacity: 0.8 }}>
+                 "{params.aboutUs}"
+              </div>
+            )}
           </div>
           
           <div style={{ margin: '1rem 0' }}>
@@ -165,11 +329,19 @@ const InvitationView = () => {
 
           <div style={{ display: 'grid', gap: '0.8rem' }}>
               <div style={{ background: 'rgba(255, 255, 255, 0.03)', border: `1px solid ${activeTheme.accent}20`, padding: '1rem', borderRadius: '18px', display: 'flex', alignItems: 'center', gap: '0.8rem', textAlign: 'left' }}>
-                  <Calendar size={20} color={activeTheme.accent} />
-                  <div>
-                     <h4 style={{ fontSize: '0.9rem', margin: '0', color: activeTheme.text }}>{new Date(params.date).toLocaleDateString('uz-UZ', { day: 'numeric', month: 'long' })}</h4>
-                     <p style={{ color: activeTheme.text, opacity: 0.6, margin: 0, fontSize: '0.75rem' }}>{new Date(params.date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
-                  </div>
+                   <Calendar size={20} color={activeTheme.accent} />
+                   <div>
+                      <h4 style={{ fontSize: '0.9rem', margin: '0', color: activeTheme.text }}>
+                        {params.date && !isNaN(new Date(params.date).getTime()) 
+                          ? new Date(params.date).toLocaleDateString('uz-UZ', { day: 'numeric', month: 'long' }) 
+                          : '---'}
+                      </h4>
+                      <p style={{ color: activeTheme.text, opacity: 0.6, margin: 0, fontSize: '0.75rem' }}>
+                        {params.date && !isNaN(new Date(params.date).getTime())
+                          ? new Date(params.date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+                          : '---'}
+                      </p>
+                   </div>
               </div>
 
               <div style={{ background: 'rgba(255, 255, 255, 0.03)', border: `1px solid ${activeTheme.accent}20`, padding: '1rem', borderRadius: '18px', display: 'flex', alignItems: 'center', gap: '0.8rem', textAlign: 'left' }}>
@@ -181,6 +353,41 @@ const InvitationView = () => {
               </div>
           </div>
        </motion.div>
+
+        {/* RSVP Card */}
+        <motion.div 
+           initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}
+           className="card" style={{ 
+              width: '100%', maxWidth: '450px', 
+              background: 'rgba(255, 255, 255, 0.05)', backdropFilter: 'blur(15px)',
+              border: `1px solid ${activeTheme.accent}20`, padding: '2rem', 
+              borderRadius: '30px', zIndex: 1, color: activeTheme.text,
+              display: 'flex', flexDirection: 'column', gap: '1.2rem',
+              marginBottom: '100px'
+           }}
+        >
+           <h3 style={{ margin: 0, fontSize: '1.2rem' }}>{lang === 'uz' ? "Tashrifingizni tasdiqlang" : "Confirm your attendance"}</h3>
+           {rsvpStatus === 'sent' ? (
+              <motion.div initial={{ scale: 0.8 }} animate={{ scale: 1 }} style={{ padding: '1rem', background: 'rgba(46, 204, 113, 0.2)', borderRadius: '15px', color: '#2ecc71', fontWeight: 'bold' }}>
+                 ✅ {lang === 'uz' ? "Rahmat! Ismingiz ro'yxatga olindi." : "Thank you! Your name is registered."}
+              </motion.div>
+           ) : (
+              <>
+                 <input 
+                   value={rsvpName} onChange={e => setRsvpName(e.target.value)}
+                   placeholder={lang === 'uz' ? "Ismingiz va familiyangiz" : "Your full name"} 
+                   style={{ padding: '12px 20px', borderRadius: '15px', background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.2)', color: 'white', outline: 'none' }}
+                 />
+                 <motion.button 
+                   whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}
+                   onClick={() => rsvpName && setRsvpStatus('sent')}
+                   style={{ padding: '12px', borderRadius: '15px', background: activeTheme.accent, color: '#000', border: 'none', fontWeight: 'bold', cursor: 'pointer' }}
+                 >
+                    {lang === 'uz' ? "Yuborish" : "Send RSVP"}
+                 </motion.button>
+              </>
+           )}
+        </motion.div>
 
        <motion.button 
           initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
