@@ -1,4 +1,4 @@
-import React, { useState, useContext, useRef } from 'react';
+import React, { useState, useContext, useRef, useCallback, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import AppContext from '../context/AppContext';
 

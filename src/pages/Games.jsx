@@ -92,26 +92,37 @@ const Games = () => {
   };
 
   return (
-    <AnimatedPage className="page-container" style={{ paddingBottom: '100px', maxWidth: '600px', margin: '0 auto' }}>
+    <AnimatedPage className="page-container" style={{ paddingBottom: '100px', maxWidth: '900px', margin: '0 auto' }}>
       <div className="card games-header" style={{ 
-        background: 'linear-gradient(135deg, var(--primary) 0%, #b8860b 100%)', 
+        background: 'linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%)', 
         color: 'white', 
-        padding: '2rem',
-        borderRadius: '24px',
-        marginBottom: '2rem',
+        padding: '3rem 2rem',
+        borderRadius: '32px',
+        marginBottom: '2.5rem',
         position: 'relative',
-        overflow: 'hidden'
+        overflow: 'hidden',
+        border: '1px solid rgba(212, 175, 55, 0.2)',
+        boxShadow: '0 20px 40px rgba(0,0,0,0.3)'
       }}>
-        <div style={{ position: 'relative', zIndex: 1 }}>
-          <h2 style={{ fontSize: '1.8rem', marginBottom: '0.5rem' }}>{langConfig.gameTitle}</h2>
-          <p style={{ opacity: 0.9 }}>{langConfig.gameDesc}</p>
+        <div style={{ position: 'relative', zIndex: 2 }}>
+          <h2 style={{ fontSize: '2.2rem', marginBottom: '0.8rem', fontFamily: 'var(--font-serif)' }}>{langConfig.gameTitle}</h2>
+          <p style={{ opacity: 0.8, fontSize: '1.1rem', maxWidth: '400px' }}>{langConfig.gameDesc}</p>
+          <div style={{ marginTop: '1.5rem', display: 'flex', gap: '15px' }}>
+             <div style={{ background: 'rgba(255,255,255,0.1)', padding: '5px 15px', borderRadius: '50px', fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '5px' }}>
+                <Trophy size={14} color="#f1c40f" /> Best Score: 1240
+             </div>
+             <div style={{ background: 'rgba(255,255,255,0.1)', padding: '5px 15px', borderRadius: '50px', fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '5px' }}>
+                <Star size={14} color="#f1c40f" /> New Games Available
+             </div>
+          </div>
         </div>
-        <Gamepad2 size={100} style={{ 
+        <Gamepad2 size={150} style={{ 
           position: 'absolute', 
-          right: '-10px', 
-          bottom: '-10px', 
-          opacity: 0.2, 
-          transform: 'rotate(-15deg)' 
+          right: '-20px', 
+          bottom: '-20px', 
+          opacity: 0.15, 
+          transform: 'rotate(-15deg)',
+          color: 'var(--primary)'
         }} />
       </div>
 
@@ -119,41 +130,46 @@ const Games = () => {
         {activeGame ? (
           <motion.div 
             key="active-game"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.95 }}
             className="card active-game-container"
             style={{ 
-              padding: '2rem 1rem', 
-              borderRadius: '28px', 
-              marginBottom: '2rem',
-              background: 'var(--card-bg)',
+              padding: '2.5rem 1.5rem', 
+              borderRadius: '35px', 
+              marginBottom: '2.5rem',
+              background: 'var(--bg-card)',
+              backdropFilter: 'blur(30px)',
               position: 'relative',
-              boxShadow: '0 20px 40px rgba(0,0,0,0.15)',
-              border: '2px solid var(--primary-light)',
-              minHeight: '450px',
+              boxShadow: '0 30px 60px rgba(0,0,0,0.4)',
+              border: '2px solid rgba(212, 175, 55, 0.3)',
+              minHeight: '500px',
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'center'
             }}
           >
-            <button 
+            <motion.button 
+              whileHover={{ scale: 1.1, rotate: 90 }} whileTap={{ scale: 0.9 }}
               onClick={() => setActiveGame(null)}
               style={{
                 position: 'absolute',
-                top: '20px',
-                right: '20px',
-                background: 'rgba(0,0,0,0.05)',
+                top: '25px',
+                right: '25px',
+                background: 'rgba(255,255,255,0.1)',
                 border: 'none',
-                color: 'var(--text)',
-                width: '40px',
-                height: '40px',
+                color: 'white',
+                width: '45px',
+                height: '45px',
                 borderRadius: '50%',
                 cursor: 'pointer',
                 zIndex: 10,
-                fontSize: '1.2rem'
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: '1.4rem'
               }}
-            >✕</button>
+            >✕</motion.button>
             <div style={{ width: '100%', display: 'flex', justifyContent: 'center' }}>
               {renderGame()}
             </div>
@@ -163,64 +179,72 @@ const Games = () => {
             key="game-list"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="games-list-vertical" 
             style={{ 
-              display: 'flex', 
-              flexDirection: 'column', 
-              gap: '1rem' 
+              display: 'grid', 
+              gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', 
+              gap: '1.5rem' 
             }}
           >
             {gameList.map((game, idx) => (
               <motion.div 
                 key={game.id}
-                whileHover={{ x: 10 }}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: idx * 0.1 }}
+                whileHover={{ y: -10, borderColor: game.color }}
                 whileTap={{ scale: 0.98 }}
                 onClick={() => game.playable && setActiveGame(game.id)}
+                className="card"
                 style={{ 
-                  display: 'flex', 
-                  alignItems: 'center',
-                  padding: '1rem',
-                  border: `1px solid ${game.color}20`,
-                  background: 'var(--card-bg)',
-                  borderRadius: '20px',
+                  padding: '1.5rem',
                   cursor: game.playable ? 'pointer' : 'not-allowed',
-                  boxShadow: '0 4px 15px rgba(0,0,0,0.05)',
-                  gap: '0.8rem',
-                  flexWrap: 'wrap'
+                  position: 'relative',
+                  overflow: 'hidden',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '1.2rem',
+                  border: '1px solid rgba(255,255,255,0.1)',
+                  background: 'rgba(255,255,255,0.02)'
                 }}
               >
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                   <div style={{ 
+                      background: `${game.color}20`, 
+                      color: game.color,
+                      width: '60px',
+                      height: '60px',
+                      borderRadius: '20px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      fontSize: '2rem',
+                      boxShadow: `0 10px 20px ${game.color}15`
+                    }}>
+                      {game.icon}
+                   </div>
+                   {game.isNew && (
+                     <div style={{ background: '#ff4444', color: 'white', fontSize: '0.7rem', padding: '4px 12px', borderRadius: '50px', fontWeight: 'bold', boxShadow: '0 5px 15px rgba(255,68,68,0.4)' }}>NEW</div>
+                   )}
+                </div>
+                
+                <div style={{ flex: 1 }}>
+                  <h3 style={{ fontSize: '1.3rem', marginBottom: '0.5rem', fontWeight: 'bold', color: 'white' }}>{game.name}</h3>
+                  <p style={{ fontSize: '0.9rem', color: 'rgba(255,255,255,0.6)', lineHeight: '1.4' }}>{game.desc}</p>
+                </div>
+
                 <div style={{ 
-                  background: `${game.color}15`, 
-                  color: game.color,
-                  width: '50px',
-                  height: '50px',
-                  borderRadius: '16px',
                   display: 'flex',
+                  justifyContent: 'space-between',
                   alignItems: 'center',
-                  justifyContent: 'center',
-                  fontSize: '1.6rem',
-                  flexShrink: 0
+                  marginTop: '0.5rem',
+                  padding: '10px 15px',
+                  background: 'rgba(255,255,255,0.05)',
+                  borderRadius: '15px'
                 }}>
-                  {game.icon}
-                  {game.isNew && (
-                    <div style={{ position: 'absolute', top: '-5px', right: '-5px', background: '#ff4444', color: 'white', fontSize: '0.6rem', padding: '2px 5px', borderRadius: '5px', fontWeight: 'bold' }}>NEW</div>
-                  )}
-                </div>
-                <div style={{ flex: 1, textAlign: 'left' }}>
-                  <h3 style={{ fontSize: '1rem', marginBottom: '0.2rem', fontWeight: 'bold' }}>{game.name}</h3>
-                  <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{game.desc}</p>
-                </div>
-                <div style={{ 
-                  fontSize: '0.65rem', 
-                  fontWeight: 'bold', 
-                  color: game.color, 
-                  background: `${game.color}10`,
-                  padding: '4px 10px',
-                  borderRadius: '50px',
-                  whiteSpace: 'nowrap',
-                  marginLeft: 'auto'
-                }}>
-                  {game.reward}
+                   <div style={{ fontSize: '0.8rem', fontWeight: 'bold', color: game.color }}>
+                      {game.reward}
+                   </div>
+                   <ChevronRight size={18} color="rgba(255,255,255,0.3)" />
                 </div>
               </motion.div>
             ))}
