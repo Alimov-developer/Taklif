@@ -105,7 +105,7 @@ function App() {
 
   // --- Socket.IO Backend Connection ---
   useEffect(() => {
-    const socket = io('http://localhost:3001', {
+    const socket = io(import.meta.env.VITE_BACKEND_URL || 'http://localhost:3001', {
       transports: ['websocket', 'polling'],
       reconnectionAttempts: 10,
       reconnectionDelay: 2000,
