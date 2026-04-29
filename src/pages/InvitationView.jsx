@@ -1,3 +1,4 @@
+import React, { useContext, useState, useEffect, useRef } from 'react';
 import { useLocation, useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Calendar, MapPin, Download, Home, X } from 'lucide-react';
@@ -53,7 +54,7 @@ const InvitationView = () => {
     return () => clearInterval(timer);
   }, [params]);
 
-  const ref = React.useRef(null);
+  const ref = useRef(null);
   const searchParams = new URLSearchParams(location.search);
   const isDlMode = searchParams.get('dl') === '1';
 
